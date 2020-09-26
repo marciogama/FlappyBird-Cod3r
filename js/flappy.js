@@ -20,7 +20,7 @@ function Barreira(reversa = false) { // função construtora
 // b.setAltura(200);
 // document.querySelector('[wm-flappy]').appendChild(b.elemento);
 
-function ParDeBarreiras(altura, abertura, x) { // função construtora
+function ParDeBarreiras(altura, abertura, x1) { // função construtora
     this.elemento = novoElemento('div', 'par-de-barreiras');
 
     this.superior = new Barreira(true);
@@ -37,11 +37,11 @@ function ParDeBarreiras(altura, abertura, x) { // função construtora
     }
 
     this.getX = () => parseInt(this.elemento.style.left.split('px')[0]);
-    this.setX = x => this.elemento.style.left = `${x}px`;
+    this.setX = x1 => this.elemento.style.left = `${x1}px`;
     this.getLargura = () => this.elemento.clientWidth;
     
     this.sortearAbertura();
-    this.setX(x);
+    this.setX(x1);
 }
 
 // testando a criação das barreiras
@@ -77,10 +77,42 @@ function Barreiras(altura, largura, abertura, espaco, notificarPonto) { // funç
     };
 }
 
+function Passaro(alturaJogo){  // função construtora
+    let voando = false;
+
+    this.elemento = novoElemento('img', 'passaro');
+    this.elemento.src = 'imgs/passaro.png';
+
+    this.getY = () => parseInt(this.elemento.style.bottom.split('px')[0]);
+    this.setY = y => this.elemento.style.bottom = `${y}px`;
+
+    window.onkeydown = e => voando = true;
+    window.onkeyup = e => voando = false;
+
+    this.animar = () => {
+        const novoY = this.getY() + (voando ? 8 : -5);
+        const alturaMaxima = alturaJogo - this.elemento.clientHeight;
+
+        if (novoY <= 0) {
+            this.setY(0);
+        } else if (novoY >= alturaMaxima) {
+            this.setY(alturaMaxima);    
+        } else {
+            this.setY(novoY);
+        }
+    }
+
+    this.setY(alturaJogo / 2);  // determino a posição inicial do passaro
+}
+
 // testando o deslocamento das barreiras
 const barreiras = new Barreiras(700, 1200, 200, 400);
+const passaro = new Passaro(700);
 const areaDoJogo = document.querySelector('[wm-flappy]');
+
+areaDoJogo.appendChild(passaro.elemento);
 barreiras.pares.forEach(par => areaDoJogo.appendChild(par.elemento));
 setInterval(() => {
-    barreiras.animar()
+    barreiras.animar();
+    passaro.animar();
 },20)
